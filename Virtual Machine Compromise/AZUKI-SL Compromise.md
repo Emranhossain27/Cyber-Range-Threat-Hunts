@@ -29,10 +29,8 @@ Complete intrusion lifecycle observed involving initial access, reconnaissance, 
 
 ---
 
-# 2. Detailed Investigation Findings
-
-## 2.1 Initial Access Identified (RDP Login)
-
+## Question: Identify the source IP address of the Remote Desktop Protocol connection? *
+-  Source IP: `88.97.178.12`
 Attacker successfully logged in at **2025-11-19T18:36:18Z**
 
 ```kql
@@ -43,16 +41,11 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,ActionType,LogonType,AccountName,RemoteIP,RemoteIPType
 | order by Timestamp asc
 ```
-- Question: Identify the source IP address of the Remote Desktop Protocol connection? *
--  Source IP: `88.97.178.12`
 ---
 <img width="1320" height="286" alt="image" src="https://github.com/user-attachments/assets/53b45966-82a2-405e-bde7-ecb327ad0ee6" />
 
-## 2.2 Compromised Account Identified
-
-- Compromised User: `kenji.sato`
-- Source IP: `88.97.178.12`
-- Remote Device: `sanc-main`
+## Question: Identify the user account that was compromised for initial access?
+-  Compromised User: `kenji.sato`
 
 ```kql
 DeviceLogonEvents
@@ -63,10 +56,10 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,AccountName
 | order by Timestamp asc
 ```
-
 ---
+<img width="1361" height="163" alt="image" src="https://github.com/user-attachments/assets/28e0ffe6-ca9d-48b1-a9d6-1b5c28244f6c" />
 
-## 2.3 Reconnaissance (Network Enumeration)
+## Question: Identify the command and argument used to enumerate network neighbours?
 
 `arp.exe -a` executed  
 Timestamp: 2025-11-19T19:04:01.773778Z
@@ -79,7 +72,7 @@ DeviceProcessEvents
 | project Timestamp,DeviceName,AccountName,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
+- Question: Identify the command and argument used to enumerate network neighbours?
 ---
 
 ## 2.4 Staging Directory Created (attrib.exe)
