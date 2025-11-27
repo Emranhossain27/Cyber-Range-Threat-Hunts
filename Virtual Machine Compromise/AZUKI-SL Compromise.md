@@ -42,8 +42,8 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,ActionType,LogonType,AccountName,RemoteIP,RemoteIPType
 | order by Timestamp asc
 ```
-<img width="1320" height="286" alt="image" src="https://github.com/user-attachments/assets/53b45966-82a2-405e-bde7-ecb327ad0ee6" />
 ---
+<img width="1320" height="286" alt="image" src="https://github.com/user-attachments/assets/53b45966-82a2-405e-bde7-ecb327ad0ee6" />
 
  ## 2.2 Question: Identify the user account that was compromised for initial access?
 -  Compromised User: `kenji.sato`
@@ -57,8 +57,8 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,AccountName
 | order by Timestamp asc
 ```
-<img width="1361" height="163" alt="image" src="https://github.com/user-attachments/assets/28e0ffe6-ca9d-48b1-a9d6-1b5c28244f6c" />
 ---
+<img width="1361" height="163" alt="image" src="https://github.com/user-attachments/assets/28e0ffe6-ca9d-48b1-a9d6-1b5c28244f6c" />
 
  ## 2.3 Question: Identify the command and argument used to enumerate network neighbours?
 
@@ -72,13 +72,13 @@ DeviceProcessEvents
 | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
 | order by Timestamp asc
 ```
+---
 <img width="1061" height="207" alt="image" src="https://github.com/user-attachments/assets/e481e71c-c936-450b-8868-456c75748c25" />
 
----
 
 ## 2.4 Question: Identify the PRIMARY staging directory where malware was stored?
 
-- Staging Directory: 
+- Staging Directory: `C:\ProgramData\WindowsCache`
 
 ```kql
 DeviceProcessEvents
@@ -89,12 +89,13 @@ DeviceProcessEvents
 | project Timestamp,DeviceName,AccountName,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="947" height="217" alt="image" src="https://github.com/user-attachments/assets/2d17991d-c2d2-4f2b-9a48-66cc56919ba4" />
+
 
 ## 2.5 Question: How many file extensions were excluded from Windows Defender scanning?
 
-- Number of File :
+- Number of File :`3`
 
 ```kql
 DeviceRegistryEvents
@@ -103,8 +104,9 @@ DeviceRegistryEvents
 | where RegistryKey contains @"Exclusions\Extensions"
 | summarize count_distinct(RegistryValueName)
 ```
-
 ---
+<img width="462" height="161" alt="image" src="https://github.com/user-attachments/assets/323ae694-4625-4034-aaf6-c27deffd16f0" />
+
 
 ## 2.6 Question: What temporary folder path was excluded from Windows Defender scanning? 
 
@@ -118,8 +120,9 @@ DeviceRegistryEvents
 | project Timestamp,RegistryKey,RegistryValueName
 | order by Timestamp asc
 ```
-
 ---
+<img width="1132" height="126" alt="image" src="https://github.com/user-attachments/assets/1125e857-0242-4df7-8053-5800bac2b798" />
+
 
 ## 2.7 Question: Identify the Windows-native binary the attacker abused to download files? 
 
@@ -133,8 +136,9 @@ DeviceProcessEvents
 | project Timestamp,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="1221" height="121" alt="image" src="https://github.com/user-attachments/assets/55d5615c-d1bf-4415-8003-982d8d3b336e" />
+
 
 ## 2.8 Question: Identify the name of the scheduled task created for persistence? *
 
@@ -148,14 +152,25 @@ DeviceProcessEvents
 | project Timestamp,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="848" height="152" alt="image" src="https://github.com/user-attachments/assets/8a4954fb-4973-4dde-b231-bd12f7e6e046" />
+
 
 ## 2.9 Question: Identify the executable path configured in the scheduled task? 
 
-
 - Executable configured path : `C:\ProgramData\WindowsCache\svchost.exe`
+
+```kql
+DeviceProcessEvents
+| where DeviceName == "azuki-sl"
+| where Timestamp between (datetime(2025-11-19) .. datetime(2025-11-20))
+| where FileName has_any ("schtasks.exe")
+| project Timestamp,FileName,ProcessCommandLine
+| order by Timestamp asc
+```
 ---
+<img width="1418" height="127" alt="image" src="https://github.com/user-attachments/assets/857fbce2-ce8e-4bd6-8802-8ade9eafcbb0" />
+
 
 ## 2.10 Question: Identify the IP address of the command and control server?
 
@@ -169,14 +184,25 @@ DeviceNetworkEvents
 | project Timestamp,RemoteIP,InitiatingProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="1202" height="127" alt="image" src="https://github.com/user-attachments/assets/76b79726-5845-4b48-8447-08141aa03905" />
+
 
 ## 2.11 Question: Identify the destination port used for command and control communications?
 
 - Destination used port  : `443`
 
+```kql
+let MainTime = datetime(2025-11-19T19:07:46.9796512Z);
+DeviceNetworkEvents
+| where DeviceName == "azuki-sl"
+| where Timestamp between (MainTime -2m .. MainTime +10m)
+| project Timestamp,RemoteIP,RemotePort,InitiatingProcessCommandLine
+| order by Timestamp asc
+```
 ---
+<img width="771" height="113" alt="image" src="https://github.com/user-attachments/assets/52dd5033-11f8-4631-949c-d4bf935a854a" />
+
 
 ## 2.12 Question: Identify the filename of the credential dumping tool?
 
@@ -190,8 +216,9 @@ DeviceProcessEvents
 | project Timestamp,FileName,FolderPath,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="791" height="121" alt="image" src="https://github.com/user-attachments/assets/d82473d4-f442-4ad5-ba1c-c3babccbeca7" />
+
 
 ## 2.13 Question: Identify the module used to extract logon passwords from memory?
 
@@ -205,8 +232,9 @@ DeviceProcessEvents
 | project Timestamp,FileName,FolderPath,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="892" height="157" alt="image" src="https://github.com/user-attachments/assets/a9803558-2290-491a-be10-54216d6ea7f3" />
+
 
 ## 2.14 Question: Identify the compressed archive filename used for data exfiltration?
 
@@ -220,8 +248,9 @@ DeviceProcessEvents
 | project Timestamp,FileName,FolderPath,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="818" height="162" alt="image" src="https://github.com/user-attachments/assets/b6e1d52f-b52d-45a1-9557-75d32639f439" />
+
 
 ## 2.15 Question: Identify the cloud service used to exfiltrate stolen data?
 
@@ -236,8 +265,9 @@ DeviceNetworkEvents
 | project Timestamp,RemoteIP,RemotePort,RemoteUrl,InitiatingProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="1635" height="200" alt="image" src="https://github.com/user-attachments/assets/752f2dcd-48d6-4538-b122-133a24d75215" />
+
 
 ## 2.16 Question: Identify the first Windows event log cleared by the attacker?
 
@@ -251,8 +281,9 @@ DeviceProcessEvents
 | project Timestamp,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="731" height="122" alt="image" src="https://github.com/user-attachments/assets/b7a1c89a-7515-40b6-96bd-c8762258a7b1" />
+
 
 ## 2.17 Question: Identify the backdoor account username created by the attacker?
 
@@ -266,8 +297,9 @@ DeviceProcessEvents
 | project Timestamp,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="733" height="122" alt="image" src="https://github.com/user-attachments/assets/6d9d2f02-5213-4df6-aa21-0ffd48a53d21" />
+
 
 ## 2.18 Question: Identify the PowerShell script file used to automate the attack chain?
 
@@ -282,8 +314,9 @@ DeviceFileEvents
 | project Timestamp,FileName,FolderPath,InitiatingProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="817" height="127" alt="image" src="https://github.com/user-attachments/assets/5efac0ca-ddbc-4728-9656-bbf1d1b99a41" />
+
 
 ## 2.19 Question: What IP address was targeted for lateral movement?
 
@@ -293,11 +326,13 @@ DeviceFileEvents
 DeviceProcessEvents
 | where DeviceName == "azuki-sl"
 | where Timestamp between (datetime(2025-11-19) .. datetime(2025-11-20))
-| where FileName has_any ("cmdkey.exe","mstsc.exe")
+| where FileName has_any ("cmdkey.exe", "mstsc.exe")
+| project Timestamp,DeviceName,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-
 ---
+<img width="682" height="167" alt="image" src="https://github.com/user-attachments/assets/0d5d759c-73b6-485a-ac8f-0f76fec54a03" />
+
 
 ## 2.20 Question: Identify the remote access tool used for lateral movement?
 
@@ -312,8 +347,8 @@ DeviceProcessEvents
 | project Timestamp,FileName,ProcessCommandLine
 | order by Timestamp desc
 ```
-
 ---
+<img width="732" height="122" alt="image" src="https://github.com/user-attachments/assets/6bc559e8-f137-4f7a-8737-b5fb57bb035b" />
 
 # Final Summary
 
