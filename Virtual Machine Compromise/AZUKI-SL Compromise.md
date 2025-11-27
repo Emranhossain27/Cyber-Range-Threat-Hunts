@@ -29,9 +29,10 @@ Complete intrusion lifecycle observed involving initial access, reconnaissance, 
 
 ---
 
-## Question: Identify the source IP address of the Remote Desktop Protocol connection? *
+ 2.1 ## Question: Identify the source IP address of the Remote Desktop Protocol connection? *
+
 -  Source IP: `88.97.178.12`
-Attacker successfully logged in at **2025-11-19T18:36:18Z**
+- Attacker successfully logged in at **2025-11-19T18:36:18Z**
 
 ```kql
 DeviceLogonEvents
@@ -44,7 +45,7 @@ DeviceLogonEvents
 ---
 <img width="1320" height="286" alt="image" src="https://github.com/user-attachments/assets/53b45966-82a2-405e-bde7-ecb327ad0ee6" />
 
-## Question: Identify the user account that was compromised for initial access?
+ 2.2 ## Question: Identify the user account that was compromised for initial access?
 -  Compromised User: `kenji.sato`
 
 ```kql
@@ -59,7 +60,7 @@ DeviceLogonEvents
 ---
 <img width="1361" height="163" alt="image" src="https://github.com/user-attachments/assets/28e0ffe6-ca9d-48b1-a9d6-1b5c28244f6c" />
 
-## Question: Identify the command and argument used to enumerate network neighbours?
+ 2.3 ## Question: Identify the command and argument used to enumerate network neighbours?
 
 `arp.exe -a` executed  
 Timestamp: 2025-11-19T19:04:01.773778Z
