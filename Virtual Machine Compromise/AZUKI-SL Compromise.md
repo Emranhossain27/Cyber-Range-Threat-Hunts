@@ -43,8 +43,10 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,ActionType,LogonType,AccountName,RemoteIP,RemoteIPType
 | order by Timestamp asc
 ```
-
+- Question: Identify the source IP address of the Remote Desktop Protocol connection? *
+-  Source IP: `88.97.178.12`
 ---
+<img width="1320" height="286" alt="image" src="https://github.com/user-attachments/assets/53b45966-82a2-405e-bde7-ecb327ad0ee6" />
 
 ## 2.2 Compromised Account Identified
 
