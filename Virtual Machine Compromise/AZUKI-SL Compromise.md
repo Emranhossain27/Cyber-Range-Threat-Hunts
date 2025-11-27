@@ -62,8 +62,7 @@ DeviceLogonEvents
 
  ## 2.3 Question: Identify the command and argument used to enumerate network neighbours?
 
-`arp.exe -a` executed  
-Timestamp: 2025-11-19T19:04:01.773778Z
+- Enumerate Network: `arp.exe -a` 
 
 ```kql
 DeviceProcessEvents
@@ -73,12 +72,11 @@ DeviceProcessEvents
 | project Timestamp,DeviceName,AccountName,FileName,ProcessCommandLine
 | order by Timestamp asc
 ```
-- Question: Identify the command and argument used to enumerate network neighbours?
 ---
 
 ## 2.4 Question: Identify the PRIMARY staging directory where malware was stored?
 
-Timestamp: 19:05:33.7665036Z
+- Staging Directory: 
 
 ```kql
 DeviceProcessEvents
@@ -93,6 +91,8 @@ DeviceProcessEvents
 ---
 
 ## 2.5 Question: How many file extensions were excluded from Windows Defender scanning?
+
+- Number of File :
 
 ```kql
 DeviceRegistryEvents
@@ -121,6 +121,8 @@ DeviceRegistryEvents
 
 ## 2.7 Question: Identify the Windows-native binary the attacker abused to download files? 
 
+- Windows-native binary: `certutil.exe`
+
 ```kql
 DeviceProcessEvents
 | where DeviceName == "azuki-sl"
@@ -134,6 +136,8 @@ DeviceProcessEvents
 
 ## 2.8 Question: Identify the name of the scheduled task created for persistence? *
 
+- Created schedule task name: `Windows Update Check`
+  
 ```kql
 DeviceProcessEvents
 | where DeviceName == "azuki-sl"
@@ -147,12 +151,13 @@ DeviceProcessEvents
 
 ## 2.9 Question: Identify the executable path configured in the scheduled task? 
 
-`C:\ProgramData\WindowsCache\svchost.exe`
 
+- Executable configured path : `C:\ProgramData\WindowsCache\svchost.exe`
 ---
 
 ## 2.10 Question: Identify the IP address of the command and control server?
-C2 IP: `78.141.196.6`
+
+- IP address of the command and Control : `78.141.196.6`
 
 ```kql
 let MainTime = datetime(2025-11-19T19:07:46.9796512Z);
@@ -167,12 +172,14 @@ DeviceNetworkEvents
 
 ## 2.11 Question: Identify the destination port used for command and control communications?
 
-443 (HTTPS)
+- Destination used port  : `443`
 
 ---
 
 ## 2.12 Question: Identify the filename of the credential dumping tool?
 
+- Filename of the credential dumping tool : `mm.exe`
+  
 ```kql
 let MainTime = datetime(2025-11-19T19:07:46.9796512Z);
 DeviceProcessEvents
@@ -186,7 +193,7 @@ DeviceProcessEvents
 
 ## 2.13 Question: Identify the module used to extract logon passwords from memory?
 
-Executed: `sekurlsa::logonpasswords`
+- Module to extract logon password : `sekurlsa::logonpasswords`
 
 ```kql
 DeviceProcessEvents
@@ -201,7 +208,7 @@ DeviceProcessEvents
 
 ## 2.14 Question: Identify the compressed archive filename used for data exfiltration?
 
-`export-data.zip`
+- Archive Filename: `export-data.zip`
 
 ```kql
 DeviceProcessEvents
@@ -215,6 +222,8 @@ DeviceProcessEvents
 ---
 
 ## 2.15 Question: Identify the cloud service used to exfiltrate stolen data?
+
+- Cloud service name : `discord`
 
 ```kql
 DeviceNetworkEvents
@@ -230,6 +239,8 @@ DeviceNetworkEvents
 
 ## 2.16 Question: Identify the first Windows event log cleared by the attacker?
 
+- Cleared Windows event log : `Security`
+
 ```kql
 DeviceProcessEvents
 | where DeviceName == "azuki-sl"
@@ -243,7 +254,7 @@ DeviceProcessEvents
 
 ## 2.17 Question: Identify the backdoor account username created by the attacker?
 
-User created: Support
+- Username created by attacker : `support`
 
 ```kql
 DeviceProcessEvents
@@ -257,6 +268,8 @@ DeviceProcessEvents
 ---
 
 ## 2.18 Question: Identify the PowerShell script file used to automate the attack chain?
+
+- Powershell script for the attack chain : `wupdate.ps1`
 
 ```kql
 DeviceFileEvents
@@ -272,7 +285,7 @@ DeviceFileEvents
 
 ## 2.19 Question: What IP address was targeted for lateral movement?
 
-Target: `10.1.0.188`
+- IP address for lateral movement : `10.1.0.188`
 
 ```kql
 DeviceProcessEvents
@@ -286,7 +299,7 @@ DeviceProcessEvents
 
 ## 2.20 Question: Identify the remote access tool used for lateral movement?
 
-Tool: `mstsc.exe`
+- Remote access tool : `mstsc.exe`
 
 ```kql
 DeviceProcessEvents
