@@ -42,8 +42,8 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,ActionType,LogonType,AccountName,RemoteIP,RemoteIPType
 | order by Timestamp asc
 ```
----
 <img width="1320" height="286" alt="image" src="https://github.com/user-attachments/assets/53b45966-82a2-405e-bde7-ecb327ad0ee6" />
+---
 
  ## 2.2 Question: Identify the user account that was compromised for initial access?
 -  Compromised User: `kenji.sato`
@@ -57,21 +57,23 @@ DeviceLogonEvents
 | project Timestamp,DeviceName,AccountName
 | order by Timestamp asc
 ```
----
 <img width="1361" height="163" alt="image" src="https://github.com/user-attachments/assets/28e0ffe6-ca9d-48b1-a9d6-1b5c28244f6c" />
+---
 
  ## 2.3 Question: Identify the command and argument used to enumerate network neighbours?
 
-- Enumerate Network: `arp.exe -a` 
+- Enumerate Network: `"ARP.EXE" -a` 
 
 ```kql
 DeviceProcessEvents
 | where DeviceName == "azuki-sl"
 | where Timestamp between (datetime(2025-11-19) .. datetime(2025-11-20))
-| where FileName has_any ("arp.exe","net.exe","ipconfig.exe")
-| project Timestamp,DeviceName,AccountName,FileName,ProcessCommandLine
+| where FileName has_any ("arp.exe", "net.exe", "ipconfig.exe")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
 | order by Timestamp asc
 ```
+<img width="1061" height="207" alt="image" src="https://github.com/user-attachments/assets/e481e71c-c936-450b-8868-456c75748c25" />
+
 ---
 
 ## 2.4 Question: Identify the PRIMARY staging directory where malware was stored?
