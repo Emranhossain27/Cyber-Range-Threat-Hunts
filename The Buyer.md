@@ -56,8 +56,16 @@ DeviceFileEvents
 **Answer:** sync.cloud-endpoint.net
 
 ``` kql
+let start_time = datetime(2026-01-15);
+let end_start = datetime(2026-01-30);
+let suspecious_file = "Daniel_Richardson_CV.pdf.exe";
 DeviceNetworkEvents
+| where DeviceName in ( "as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_start )
 | where RemoteUrl contains ".net"
+| where InitiatingProcessFileName in ("powershell.exe","cmd.exe","curl.exe","wget.exe","bitsadmin.exe")
+| project TimeGenerated, DeviceName,RemoteUrl,RemoteIP
+
 ```
 
 ------------------------------------------------------------------------
