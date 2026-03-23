@@ -757,6 +757,18 @@ DeviceFileEvents
 **Question:** What hosts were compromised?  
 **MITRE:** T1486  
 **Answer:** as-pc2, as-srv 
-```
-```
 ---
+
+## 📌 Executive Summary
+
+This investigation analyzes a multi-stage Akira ransomware attack using Microsoft Defender for Endpoint and KQL-based threat hunting techniques.
+
+The attack began with the execution of a malicious file disguised as a resume (`Daniel_Richardson_CV.pdf.exe`), leading to initial access through a remote access tool (AnyDesk). The attacker established command and control (C2) communication with external infrastructure (`cloud-endpoint.net`) and deployed a beacon (`wsync.exe`) to maintain persistence.
+
+Following initial compromise, the attacker performed credential discovery targeting LSASS, conducted network reconnaissance using a custom scanner (`scan.exe`), and enumerated internal systems. Lateral movement was observed through administrative account access to the server (`as-srv`).
+
+Data was staged and compressed using `st.exe`, producing `exfil_data.zip`, indicating preparation for exfiltration. The final stage involved deployment of the Akira ransomware (`updater.exe`), execution of backup deletion commands (`vssadmin delete shadows`), and encryption of files with the `.akira` extension.
+
+To evade detection and hinder investigation, the attacker disabled security controls via registry modification (`DisableAntiSpyware`) and executed a cleanup script (`clean.bat`) to remove artifacts.
+
+The attack impacted multiple hosts, primarily `as-pc2` and `as-srv`, demonstrating a complete adversary lifecycle aligned with MITRE ATT&CK techniques including Initial Access, Execution, Persistence, Defense Evasion, Credential Access, Discovery, Lateral Movement, Exfiltration, and Impact.
