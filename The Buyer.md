@@ -2,7 +2,70 @@
 
 ## Analyst: Emran Hossain
 
-Platform: Microsoft Defender for Endpoint (KQL)
+# Incident Investigation Report – Threat Hunting & Forensics Analysis
+
+> This project demonstrates hands-on experience in threat hunting, incident investigation, and security analysis using real-world attack scenarios.
+
+---
+
+## Overview
+
+This report documents a threat hunting investigation conducted using Microsoft Defender for Endpoint (MDE). The objective of this analysis was to identify attacker activity, trace the attack timeline, and uncover persistence mechanisms used during the compromise.
+
+The investigation focuses on analyzing endpoint telemetry, including process execution, file activity, registry changes, and scheduled tasks using Kusto Query Language (KQL).
+
+---
+
+## Objective
+
+The primary objectives of this investigation are:
+
+- Identify the initial access method used by the attacker  
+- Determine the compromised systems and user accounts  
+- Detect tools and binaries executed during the attack  
+- Analyze attacker techniques such as lateral movement and persistence  
+- Map observed behaviors to MITRE ATT&CK techniques  
+
+---
+
+## Scope
+
+- **Data Source:** Microsoft Defender for Endpoint (MDE)  
+
+- **Logs Analyzed:**
+  - DeviceProcessEvents  
+  - DeviceFileEvents  
+  - DeviceNetworkEvents  
+  - DeviceRegistryEvents  
+  - DeviceEvents  
+
+- **Investigation Timeframe:**
+  - Focused on attack activity observed within the lab environment  
+
+---
+
+## Tools & Technologies
+
+- Microsoft Defender for Endpoint (MDE)  
+- Kusto Query Language (KQL)  
+- Threat Hunting Techniques  
+- MITRE ATT&CK Framework  
+
+---
+
+## Methodology
+
+The investigation followed a structured threat hunting approach:
+
+1. Identified suspicious login activity (RDP access)  
+2. Tracked process execution under compromised accounts  
+3. Investigated file creation and download activity  
+4. Analyzed command-line arguments for attacker behavior  
+5. Detected persistence mechanisms such as scheduled tasks  
+6. Correlated events across multiple data sources to build a timeline  
+
+---
+
 
 ------------------------------------------------------------------------
 
@@ -750,7 +813,6 @@ DeviceFileEvents
 
 ```
 <img width="947" height="46" alt="image" src="https://github.com/user-attachments/assets/1e1ea2ec-8393-4e6f-a849-9453bb134167" />
-
 ---
 
 ### 🚩 Q40  
@@ -758,6 +820,7 @@ DeviceFileEvents
 **MITRE:** T1486  
 **Answer:** as-pc2, as-srv 
 ---
+
 
 ## 📌 Executive Summary
 
