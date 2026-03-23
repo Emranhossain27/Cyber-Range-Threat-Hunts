@@ -67,6 +67,7 @@ DeviceNetworkEvents
 | project TimeGenerated, DeviceName,RemoteUrl,RemoteIP
 
 ```
+<img width="877" height="237" alt="image" src="https://github.com/user-attachments/assets/c7583a8e-882d-43b0-a063-995d025ca56f" />
 
 ------------------------------------------------------------------------
 
