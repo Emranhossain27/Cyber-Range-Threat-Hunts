@@ -359,3 +359,404 @@ DeviceProcessEvents
 <img width="891" height="43" alt="image" src="https://github.com/user-attachments/assets/6bafe8c3-517c-4822-91ea-3d777d01565a" />
 ---
 
+
+### 🚩 Q21  
+**Question:** SHA256 of original beacon?  
+**MITRE:** T1071  
+**Answer:** 66b876c52946f4aed47dd696d790972ff265b6f4451dab54245bc4ef1206d90b  
+```
+let target_time = datetime(2026-01-27 20:22:50);
+DeviceProcessEvents
+| where DeviceName in ("as-pc2")
+| where FileName endswith ".exe"
+| where not( FolderPath startswith "C:\\Windows")
+| where not (FolderPath startswith "C:\\Program Files (x86)")
+| where FileName contains "wsync.exe"
+| where TimeGenerated between (target_time - 60m .. target_time + 60m)
+| project TimeGenerated, FileName, SHA256
+| order by TimeGenerated asc
+
+```
+<img width="1125" height="82" alt="image" src="https://github.com/user-attachments/assets/1e041095-09ab-4987-9cbe-b070d704e829" />
+
+---
+
+### 🚩 Q22  
+**Question:** SHA256 of replacement beacon?  
+**MITRE:** T1071  
+**Answer:** 0072ca0d0adc9a1b2e1625db4409f57fc32b5a09c414786bf08c4d8e6a073654  
+```
+let target_time = datetime(2026-01-27 20:22:50);
+DeviceProcessEvents
+| where DeviceName in ("as-pc2")
+| where FileName endswith ".exe"
+| where not( FolderPath startswith "C:\\Windows")
+| where not (FolderPath startswith "C:\\Program Files (x86)")
+| where FileName contains "wsync.exe"
+| where TimeGenerated between (target_time - 60m .. target_time + 60m)
+| project TimeGenerated, FileName, SHA256
+| order by TimeGenerated asc
+
+```
+<img width="1135" height="46" alt="image" src="https://github.com/user-attachments/assets/14b10562-4a28-43e3-8777-231113fdc859" />
+```
+---
+
+# 🧩 SECTION 7: RECONNAISSANCE
+
+### 🚩 Q23  
+**Question:** What scanner tool was used?  
+**MITRE:** T1046  
+**Answer:** scan.exe
+```
+
+let target_time = datetime(2026-01-27 20:22:50);
+DeviceProcessEvents
+| where DeviceName in ( "as-pc","as-pc1","as-srv","as-pc2")
+| where FileName endswith ".exe"
+| where not( FolderPath startswith "C:\\Windows")
+| where not (FolderPath startswith "C:\\Program Files (x86)")
+| where ProcessCommandLine has_any ("scan")
+| where TimeGenerated between (target_time - 60m .. target_time + 60m)
+| project TimeGenerated, FileName, FolderPath, ProcessCommandLine
+| order by TimeGenerated asc
+
+```
+<img width="1048" height="71" alt="image" src="https://github.com/user-attachments/assets/1699f6ec-9a2c-4019-83af-d9c6ef7df028" />
+---
+
+### 🚩 Q24  
+**Question:** SHA256 of scanner?  
+**MITRE:** T1046  
+**Answer:** 26d5748ffe6bd95e3fee6ce184d388a1a681006dc23a0f08d53c083c593c193b  
+```
+let target_time = datetime(2026-01-27 20:22:50);
+DeviceProcessEvents
+| where DeviceName in ( "as-pc","as-pc1","as-srv","as-pc2")
+| where FileName endswith ".exe"
+| where not( FolderPath startswith "C:\\Windows")
+| where not (FolderPath startswith "C:\\Program Files (x86)")
+| where ProcessCommandLine has_any ("scan")
+| where TimeGenerated between (target_time - 60m .. target_time + 60m)
+| project TimeGenerated, FileName,ProcessCommandLine,SHA256
+| order by TimeGenerated asc
+
+```
+<img width="1355" height="105" alt="image" src="https://github.com/user-attachments/assets/80e15e4b-05da-4fba-90c9-705967fa4134" />
+---
+
+### 🚩 Q25  
+**Question:** What arguments were used?  
+**MITRE:** T1046  
+**Answer:** /portable "C:/Users/david.mitchell/Downloads/" /lng en_us  
+```
+let target_time = datetime(2026-01-27 20:17:50);
+DeviceProcessEvents
+| where DeviceName in ( "as-pc","as-pc1","as-srv","as-pc2")
+| where FileName endswith ".exe"
+| where not( FolderPath startswith "C:\\Windows")
+| where not (FolderPath startswith "C:\\Program Files (x86)")
+| where TimeGenerated between (target_time - 2m .. target_time + 2m)
+| project TimeGenerated, FileName,ProcessCommandLine,SHA256
+| order by TimeGenerated asc
+
+```
+<img width="1200" height="35" alt="image" src="https://github.com/user-attachments/assets/8e7a3901-e987-41e5-bc0b-189d3dbf3f5b" />
+---
+
+### 🚩 Q26  
+**Question:** What internal IPs were enumerated?  
+**MITRE:** T1046  
+**Answer:** 10.1.0.154,10.1.0.183  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceProcessEvents
+| where DeviceName in ("as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time)
+| where ProcessCommandLine has_any ("net.exe")
+| extend internalIP = extract(@"\\\\(\d+\.\d+\.\d+\.\d+)",1,ProcessCommandLine)
+| summarize count() by internalIP
+
+```
+<img width="662" height="232" alt="image" src="https://github.com/user-attachments/assets/decfbbc8-b38f-4fd1-bcb7-4de681353835" />
+---
+
+# 🧩 SECTION 8: LATERAL MOVEMENT
+
+### 🚩 Q27  
+**Question:** What account accessed AS-SRV?  
+**MITRE:** T1021  
+**Answer:** as.srv.administrator  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceLogonEvents
+| where DeviceName =="as-srv"
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType == "LogonSuccess"
+| project TimeGenerated,DeviceName,AccountName
+| summarize count() by AccountName
+
+```
+<img width="407" height="42" alt="image" src="https://github.com/user-attachments/assets/9915612b-eb7f-4a0f-8223-5ee70a3b01d2" />
+
+---
+
+# 🧩 SECTION 9: TOOL TRANSFER
+
+### 🚩 Q28  
+**Question:** What LOLBIN used first?  
+**MITRE:** T1105  
+**Answer:** bitsadmin.exe  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceProcessEvents
+| where DeviceName in ( "as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time )
+| where ProcessCommandLine has_any ("bitsadmin")
+| project TimeGenerated,DeviceName,ProcessCommandLine,FileName
+
+```
+<img width="1016" height="45" alt="image" src="https://github.com/user-attachments/assets/c0102d7a-eaa8-45a4-81ee-3f7bdc246bd9" />
+
+---
+
+### 🚩 Q29  
+**Question:** What PowerShell cmdlet used?  
+**MITRE:** T1105  
+**Answer:** Invoke-WebRequest  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceProcessEvents
+| where DeviceName in ("as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time)
+| where InitiatingProcessFileName == "powershell.exe"
+| where ProcessCommandLine has_any ("http","https","Download","WebClient","Invoke")
+| project TimeGenerated, ProcessCommandLine
+| order by TimeGenerated asc
+
+```
+
+---
+
+# 🧩 SECTION 10: EXFILTRATION
+
+### 🚩 Q30  
+**Question:** What tool compressed data?  
+**MITRE:** T1041  
+**Answer:** st.exe  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType == "FileCreated"
+| where FileName has_any (".zip",".7z")
+| project TimeGenerated, DeviceName, FileName, FolderPath, InitiatingProcessFileName
+
+```
+<img width="1127" height="30" alt="image" src="https://github.com/user-attachments/assets/f0276ee3-70db-4447-a7f7-def67a68b737" />
+
+---
+
+### 🚩 Q31  
+**Question:** SHA256 of staging tool?  
+**MITRE:** T1041  
+**Answer:** 512a1f4ed9f512572608c729a2b89f44ea66a40433073aedcd914bd2d33b7015  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType == "FileCreated"
+| where InitiatingProcessFileName contains "st.exe"
+| where FileName has_any (".zip",".7z")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName,InitiatingProcessSHA256
+
+```
+<img width="1371" height="37" alt="image" src="https://github.com/user-attachments/assets/aa75a91a-192d-4024-91fb-d01c6244af19" />
+
+---
+
+### 🚩 Q32  
+**Question:** What archive created?  
+**MITRE:** T1041  
+**Answer:** exfil_data.zip  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType == "FileCreated"
+| where FileName has_any (".zip",".7z")
+| project TimeGenerated, DeviceName, FileName, FolderPath, InitiatingProcessFileName,SHA256
+
+```
+<img width="1165" height="56" alt="image" src="https://github.com/user-attachments/assets/906299b8-7418-4e0d-8432-d9dbb9dd7ec6" />
+
+---
+
+# 🧩 SECTION 11: RANSOMWARE DEPLOYMENT
+
+### 🚩 Q33  
+**Question:** Ransomware filename?  
+**MITRE:** T1486  
+**Answer:** updater.exe  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-srv")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType =="FileCreated"
+| where FolderPath startswith @"C:\Users\AS.SRV.Administrator"
+| project TimeGenerated, FileName, FolderPath,
+          InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by TimeGenerated desc
+
+```
+<img width="1253" height="116" alt="image" src="https://github.com/user-attachments/assets/9220f61d-9c16-4d5e-820b-6eb05276d0a6" />
+
+---
+
+### 🚩 Q34  
+**Question:** SHA256 of ransomware?  
+**MITRE:** T1486  
+**Answer:** e609d070ee9f76934d73353be4ef7ff34b3ecc3a2d1e5d052140ed4cb9e4752b  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-srv")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType =="FileCreated"
+| where InitiatingProcessFileName == "updater.exe"
+| where FolderPath startswith @"C:\Users\AS.SRV.Administrator"
+| project TimeGenerated, FileName, FolderPath,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,InitiatingProcessSHA256
+| order by TimeGenerated desc
+
+```
+<img width="1381" height="55" alt="image" src="https://github.com/user-attachments/assets/6021c179-ca90-4a10-8741-f9e56683b3cb" />
+
+---
+
+### 🚩 Q35  
+**Question:** What process staged ransomware?  
+**MITRE:** T1059  
+**Answer:** powershell.exe  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-srv")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType =="FileCreated"
+| where FolderPath startswith @"C:\Users\AS.SRV.Administrator"
+| project TimeGenerated, FileName, FolderPath,
+          InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by TimeGenerated desc
+
+```
+<img width="693" height="32" alt="image" src="https://github.com/user-attachments/assets/0f8afe3a-2d1b-4c15-bb85-4975dadc6529" />
+
+---
+
+### 🚩 Q36  
+**Question:** What command deleted backups?  
+**MITRE:** T1490  
+**Answer:** vssadmin delete shadows /all /quiet  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceProcessEvents
+| where DeviceName in ("as-pc","as-pc1","as-srv","as-pc2")
+| where TimeGenerated between (start_time .. end_time)
+| where ProcessCommandLine has_any ("vssadmin")
+| project TimeGenerated, DeviceName, FileName, FolderPath,ProcessCommandLine
+
+```
+<img width="1413" height="90" alt="image" src="https://github.com/user-attachments/assets/efca705f-04b0-4131-9da3-c15773bf1b71" />
+
+---
+
+### 🚩 Q37  
+**Question:** What process dropped ransom note?  
+**MITRE:** T1486  
+**Answer:** updater.exe  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-srv")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType =="FileCreated"
+| where FileName contains ".txt"
+| where InitiatingProcessFileName contains "updater.exe"
+| where FolderPath startswith @"C:\Users\AS.SRV.Administrator"
+| project TimeGenerated, FileName, FolderPath,
+          InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by TimeGenerated desc
+
+```
+<img width="1238" height="73" alt="image" src="https://github.com/user-attachments/assets/17e27c63-fe9b-4da0-8d18-b56619add1db" />
+
+---
+
+### 🚩 Q38  
+**Question:** What time encryption began?  
+**MITRE:** T1486  
+**Answer:** 22:18:33  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-srv")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType =="FileCreated"
+| where FileName contains ".txt"
+| where InitiatingProcessFileName contains "updater.exe"
+| where FolderPath startswith @"C:\Users\AS.SRV.Administrator"
+| project TimeGenerated, FileName, FolderPath
+| order by TimeGenerated desc
+
+```
+<img width="1067" height="61" alt="image" src="https://github.com/user-attachments/assets/6fd0a50a-157a-4bfc-bfc8-b44dbff7cad2" />
+
+---
+
+# 🧩 SECTION 12: ANTI-FORENSICS
+
+### 🚩 Q39  
+**Question:** What script deleted ransomware?  
+**MITRE:** T1070  
+**Answer:** clean.bat  
+```
+let start_time = datetime(2026-01-15);
+let end_time = datetime(2026-01-30);
+DeviceFileEvents
+| where DeviceName in ("as-srv")
+| where TimeGenerated between (start_time .. end_time)
+| where ActionType == "FileDeleted"
+| where FolderPath startswith @"C:\Users\AS.SRV.Administrator"
+| project TimeGenerated, FileName,InitiatingProcessCommandLine
+| order by TimeGenerated desc
+
+```
+<img width="947" height="46" alt="image" src="https://github.com/user-attachments/assets/1e1ea2ec-8393-4e6f-a849-9453bb134167" />
+
+---
+
+### 🚩 Q40  
+**Question:** What hosts were compromised?  
+**MITRE:** T1486  
+**Answer:** as-pc2, as-srv 
+```
+```
+---
